@@ -1,0 +1,53 @@
+// Prisma schema for the dry cleaner portal.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum BookingStatus {
+  RECEIVED
+  READY
+  DELIVERED
+}
+
+model Booking {
+  id                    String        @id @default(cuid())
+  bookingNumber         Int           @unique @default(autoincrement())
+  customerName          String
+  phone                 String
+  status                BookingStatus @default(RECEIVED)
+  totalAmount           Decimal       @db.Decimal(10, 2)
+  notes                 String?
+  createdAt             DateTime      @default(now())
+  readyAt               DateTime?
+  deliveredAt           DateTime?
+  confirmationSmsSentAt DateTime?
+  readySmsSentAt        DateTime?
+  items                 BookingItem[]
+
+  @@index([phone])
+  @@index([createdAt])
+}
+
+model BookingItem {
+  id        String  @id @default(cuid())
+  booking   Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  bookingId String
+  itemName  String
+  unitPrice Decimal @db.Decimal(10, 2)
+  quantity  Int
+  lineTotal Decimal @db.Decimal(10, 2)
+}
+
+model PriceListItem {
+  id        String  @id @default(cuid())
+  name      String  @unique
+  price     Decimal @db.Decimal(10, 2)
+  active    Boolean @default(true)
+  sortOrder Int     @default(0)
+}

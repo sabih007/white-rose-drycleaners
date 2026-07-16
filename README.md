@@ -1,36 +1,64 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Dry Cleaner Portal
 
-## Getting Started
+A password-protected portal for the shop owner to log bookings, look customers
+up by phone number, print receipts, and text customers automatically.
 
-First, run the development server:
+## Features
+
+- **New booking** — pick items from a price list, quantities auto-calculate the total, saved to Postgres.
+- **Find by phone** — look up a customer's booking history by phone number.
+- **Status tracking** — Received -> Ready -> Delivered. Marking a booking "Ready" texts the customer with the total due.
+- **Printable receipt** — each booking has a receipt page with a Print button.
+- **Price list** — editable list of item types and prices used on the booking form.
+- **Login** — single shared password protects the whole portal.
+
+## Local development
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open the printed local URL (usually http://localhost:3000, or the next free
+port if that one's taken).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Environment variables
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Copy `.env.example` to `.env` and fill these in (a working `.env` with a
+**temporary** database is already included so you can try the app immediately
+— see "Database" below):
 
-## Learn More
+| Variable | Purpose |
+| --- | --- |
+| `DATABASE_URL` | Postgres connection string. |
+| `APP_PASSWORD` | The password used to log into the portal. **Change this before sharing the link.** |
+| `SESSION_SECRET` | Random string used to sign login sessions. Generate one with `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`. |
+| `SHOP_NAME` | Shown in SMS messages and on the printed receipt. |
+| `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_PHONE_NUMBER` | From your [Twilio Console](https://console.twilio.com). Leave blank to disable SMS — bookings still save fine, they just won't text the customer. |
 
-To learn more about Next.js, take a look at the following resources:
+## Database
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+This repo comes with a **temporary** Prisma Postgres database (auto-deletes
+after 24 hours) so the app runs out of the box. Before that expires, either:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **Claim it permanently**: open the `CLAIM_URL` printed in `.env` in your
+  browser and follow the prompts, or
+- **Use your own Postgres**: create one via the
+  [Vercel Marketplace](https://vercel.com/marketplace) (Neon, etc.) or any
+  Postgres host, put its connection string in `DATABASE_URL`, then run:
 
-## Deploy on Vercel
+  ```bash
+  npx prisma migrate deploy
+  ```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Deploying to Vercel
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. Install the CLI: `npm i -g vercel`
+2. From this folder: `vercel link`, then `vercel env add` for each variable
+   above (`DATABASE_URL`, `APP_PASSWORD`, `SESSION_SECRET`, `SHOP_NAME`,
+   `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_PHONE_NUMBER`).
+3. Deploy: `vercel --prod`
+
+## Tech
+
+Next.js (App Router) + Prisma/Postgres + Twilio, deployable on Vercel.
