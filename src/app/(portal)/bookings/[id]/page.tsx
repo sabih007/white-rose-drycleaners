@@ -54,7 +54,9 @@ export default async function BookingDetailPage({
       <Card className="print:rounded-none print:p-0 print:ring-0">
         <CardHeader className="flex items-start justify-between">
           <div>
-            <h1 className="text-lg font-semibold">{shopName}</h1>
+            <h1 className="font-heading text-xl font-semibold text-primary">
+              {shopName}
+            </h1>
             <p className="text-xs text-muted-foreground">
               Receipt #{b.bookingCode}
             </p>
