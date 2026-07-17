@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { normalizePhone } from "@/lib/phone";
-import { sendSms } from "@/lib/sms";
+import { sendWhatsAppMessage } from "@/lib/whatsapp";
 import { serializeBooking } from "@/lib/serialize";
 import { formatBookingNumber } from "@/lib/booking-number";
 
@@ -98,7 +98,7 @@ export async function POST(request: NextRequest) {
   const shopName = process.env.SHOP_NAME || "the dry cleaner";
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
   const bookingCode = formatBookingNumber(booking.bookingNumber);
-  const sms = await sendSms(
+  const sms = await sendWhatsAppMessage(
     phoneNormalized,
     `Hi ${customerName}, ${shopName} received ${itemCount} item(s) for cleaning (Booking #${bookingCode}). Total: ${totalAmount.toFixed(2)}. We'll text you when it's ready.`
   );

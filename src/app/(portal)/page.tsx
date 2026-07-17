@@ -44,7 +44,8 @@ export default async function DashboardPage() {
           <CardTitle>New Booking</CardTitle>
           <CardDescription>
             Enter the customer&apos;s clothes and phone number. The total is
-            calculated automatically and a confirmation SMS is sent.
+            calculated automatically and a confirmation WhatsApp message is
+            sent.
           </CardDescription>
         </CardHeader>
         <CardContent>

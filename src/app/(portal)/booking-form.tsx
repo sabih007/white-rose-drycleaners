@@ -92,8 +92,8 @@ export default function BookingForm({ priceList }: { priceList: PriceItem[] }) {
       });
       toast.success("Booking saved", {
         description: data.smsSent
-          ? "Confirmation SMS sent to the customer."
-          : "SMS could not be sent — check Twilio settings.",
+          ? "Confirmation WhatsApp message sent to the customer."
+          : "WhatsApp message could not be sent — check Twilio settings.",
       });
       setCustomerName("");
       setPhone("");
@@ -114,8 +114,8 @@ export default function BookingForm({ priceList }: { priceList: PriceItem[] }) {
         </AlertTitle>
         <AlertDescription>
           {result.smsSent
-            ? "Confirmation SMS sent to the customer."
-            : "Booking saved, but the SMS could not be sent (check Twilio settings)."}
+            ? "Confirmation WhatsApp message sent to the customer."
+            : "Booking saved, but the WhatsApp message could not be sent (check Twilio settings)."}
         </AlertDescription>
         <div className="mt-3 flex gap-2">
           <Button size="sm" render={<a href={`/bookings/${result.id}`} />}>

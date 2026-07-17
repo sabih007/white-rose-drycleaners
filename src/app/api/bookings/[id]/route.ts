@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { sendSms } from "@/lib/sms";
+import { sendWhatsAppMessage } from "@/lib/whatsapp";
 import { serializeBooking } from "@/lib/serialize";
 import { formatBookingNumber } from "@/lib/booking-number";
 
@@ -62,7 +62,7 @@ export async function PATCH(
   if (parsed.data.status === "READY" && !existing.readySmsSentAt) {
     const shopName = process.env.SHOP_NAME || "the dry cleaner";
     const bookingCode = formatBookingNumber(booking.bookingNumber);
-    const sms = await sendSms(
+    const sms = await sendWhatsAppMessage(
       booking.phone,
       `Hi ${booking.customerName}, your order at ${shopName} (Booking #${bookingCode}) is ready for pickup/delivery. Total due: ${Number(booking.totalAmount).toFixed(2)}.`
     );

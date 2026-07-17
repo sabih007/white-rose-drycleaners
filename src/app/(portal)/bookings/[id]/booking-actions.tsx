@@ -47,9 +47,9 @@ export default function BookingActions({
       setCurrent(next);
       if (next === "READY") {
         if (data.smsSent) {
-          toast.success("Marked ready and SMS sent to customer.");
+          toast.success("Marked ready and WhatsApp message sent to customer.");
         } else {
-          toast.warning("Marked ready, but SMS could not be sent.");
+          toast.warning("Marked ready, but WhatsApp message could not be sent.");
         }
       } else {
         toast.success(`Status set to ${statusLabel[next]}.`);
