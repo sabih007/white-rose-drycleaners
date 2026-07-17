@@ -49,6 +49,12 @@ export default function MobileNav() {
             Find by Phone
           </SheetClose>
           <SheetClose
+            render={<Link href="/orders" />}
+            className="rounded-md px-3 py-2 text-sm font-medium hover:bg-muted"
+          >
+            Orders
+          </SheetClose>
+          <SheetClose
             render={<Link href="/settings/prices" />}
             className="rounded-md px-3 py-2 text-sm font-medium hover:bg-muted"
           >

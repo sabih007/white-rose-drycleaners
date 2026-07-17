@@ -32,6 +32,9 @@ export default function PortalLayout({
             <Button variant="ghost" size="sm" render={<Link href="/search" />}>
               Find by Phone
             </Button>
+            <Button variant="ghost" size="sm" render={<Link href="/orders" />}>
+              Orders
+            </Button>
             <Button
               variant="ghost"
               size="sm"
