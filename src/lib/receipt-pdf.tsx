@@ -1,10 +1,17 @@
+import fs from "fs";
+import path from "path";
 import {
   Document,
   Page,
   Text,
   View,
+  Image,
   StyleSheet,
 } from "@react-pdf/renderer";
+
+const QR_CODE_BUFFER = fs.readFileSync(
+  path.join(process.cwd(), "public", "qr.png")
+);
 
 type SerializedBooking = {
   id: string;
@@ -24,52 +31,95 @@ type SerializedBooking = {
   }[];
 };
 
+const ACCENT = "#0f766e";
+
 const styles = StyleSheet.create({
   page: {
-    padding: 32,
     fontSize: 11,
     fontFamily: "Helvetica",
     color: "#171717",
   },
-  headerRow: {
+  headerBand: {
+    backgroundColor: ACCENT,
+    paddingHorizontal: 32,
+    paddingVertical: 20,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-start",
-    marginBottom: 16,
+  },
+  body: {
+    padding: 32,
+    paddingTop: 20,
   },
   shopName: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 700,
+    color: "#ffffff",
   },
   subtle: {
     fontSize: 9,
     color: "#737373",
     marginTop: 2,
   },
+  headerSubtle: {
+    fontSize: 9,
+    color: "#d1fae5",
+    marginTop: 3,
+    letterSpacing: 0.5,
+  },
   badge: {
     fontSize: 9,
-    paddingVertical: 3,
-    paddingHorizontal: 8,
+    fontWeight: 700,
+    paddingVertical: 4,
+    paddingHorizontal: 10,
     borderRadius: 10,
-    backgroundColor: "#f5f5f5",
-    color: "#171717",
+    backgroundColor: "#ffffff",
+    color: ACCENT,
   },
   metaGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    marginBottom: 16,
+    marginTop: 20,
+    marginBottom: 4,
   },
   metaItem: {
     width: "50%",
-    marginBottom: 8,
+    marginBottom: 12,
   },
   metaLabel: {
-    fontSize: 9,
-    color: "#737373",
+    fontSize: 8.5,
+    color: "#a3a3a3",
+    textTransform: "uppercase",
+    letterSpacing: 0.6,
   },
   metaValue: {
     fontSize: 11,
-    marginTop: 1,
+    marginTop: 2,
+    fontWeight: 500,
+  },
+  deliveryBanner: {
+    marginTop: 4,
+    marginBottom: 16,
+    padding: 12,
+    borderRadius: 6,
+    backgroundColor: "#f0fdfa",
+    borderWidth: 1,
+    borderColor: "#99f6e4",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  deliveryLabel: {
+    fontSize: 9,
+    color: "#0f766e",
+    textTransform: "uppercase",
+    letterSpacing: 0.6,
+  },
+  deliveryValue: {
+    fontSize: 13,
+    fontWeight: 700,
+    color: "#115e59",
+    marginTop: 2,
   },
   table: {
     marginTop: 8,
@@ -78,15 +128,21 @@ const styles = StyleSheet.create({
   },
   tableHeaderRow: {
     flexDirection: "row",
+    backgroundColor: "#fafafa",
     borderBottomWidth: 1,
     borderBottomColor: "#e5e5e5",
-    paddingVertical: 6,
+    paddingVertical: 7,
+    paddingHorizontal: 6,
   },
   tableRow: {
     flexDirection: "row",
     borderBottomWidth: 1,
     borderBottomColor: "#f0f0f0",
-    paddingVertical: 6,
+    paddingVertical: 7,
+    paddingHorizontal: 6,
+  },
+  tableRowAlt: {
+    backgroundColor: "#fafafa",
   },
   colItem: { width: "40%" },
   colQty: { width: "20%" },
@@ -94,21 +150,68 @@ const styles = StyleSheet.create({
   colTotal: { width: "20%", textAlign: "right" },
   tableHeaderText: {
     fontSize: 9,
+    fontWeight: 700,
     color: "#737373",
   },
   totalRow: {
     flexDirection: "row",
     justifyContent: "flex-end",
-    marginTop: 12,
+    alignItems: "center",
+    marginTop: 14,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: "#e5e5e5",
+  },
+  totalLabel: {
+    fontSize: 10,
+    color: "#737373",
+    marginRight: 8,
   },
   totalText: {
-    fontSize: 13,
+    fontSize: 16,
     fontWeight: 700,
+    color: ACCENT,
   },
   notes: {
     marginTop: 16,
     fontSize: 10,
     color: "#525252",
+  },
+  footer: {
+    marginTop: 28,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: "#e5e5e5",
+    textAlign: "center",
+  },
+  footerText: {
+    fontSize: 9,
+    color: "#a3a3a3",
+  },
+  paymentBox: {
+    marginTop: 16,
+    padding: 12,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: "#e5e5e5",
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  paymentQr: {
+    width: 60,
+    height: 60,
+    marginRight: 12,
+  },
+  paymentLabel: {
+    fontSize: 9,
+    color: "#a3a3a3",
+    textTransform: "uppercase",
+    letterSpacing: 0.6,
+  },
+  paymentValue: {
+    fontSize: 11,
+    fontWeight: 700,
+    marginTop: 2,
   },
 });
 
@@ -118,6 +221,12 @@ const statusLabel: Record<string, string> = {
   DELIVERED: "Delivered",
 };
 
+function getExpectedDelivery(createdAt: Date | string) {
+  const date = new Date(createdAt);
+  date.setDate(date.getDate() + 5);
+  return date;
+}
+
 export function ReceiptDocument({
   booking,
   shopName,
@@ -125,70 +234,118 @@ export function ReceiptDocument({
   booking: SerializedBooking;
   shopName: string;
 }) {
+  const expectedDelivery = getExpectedDelivery(booking.createdAt);
+
   return (
     <Document>
       <Page size="A5" style={styles.page}>
-        <View style={styles.headerRow}>
+        <View style={styles.headerBand}>
           <View>
             <Text style={styles.shopName}>{shopName}</Text>
-            <Text style={styles.subtle}>Receipt #{booking.bookingCode}</Text>
+            <Text style={styles.headerSubtle}>
+              RECEIPT #{booking.bookingCode}
+            </Text>
           </View>
           <Text style={styles.badge}>
-            {statusLabel[booking.status] ?? booking.status}
+            {(statusLabel[booking.status] ?? booking.status).toUpperCase()}
           </Text>
         </View>
 
-        <View style={styles.metaGrid}>
-          <View style={styles.metaItem}>
-            <Text style={styles.metaLabel}>Customer</Text>
-            <Text style={styles.metaValue}>{booking.customerName}</Text>
-          </View>
-          <View style={styles.metaItem}>
-            <Text style={styles.metaLabel}>Phone</Text>
-            <Text style={styles.metaValue}>{booking.phone}</Text>
-          </View>
-          <View style={styles.metaItem}>
-            <Text style={styles.metaLabel}>Received</Text>
-            <Text style={styles.metaValue}>
-              {new Date(booking.createdAt).toLocaleString()}
-            </Text>
-          </View>
-          <View style={styles.metaItem}>
-            <Text style={styles.metaLabel}>Booking #</Text>
-            <Text style={styles.metaValue}>{booking.bookingCode}</Text>
-          </View>
-        </View>
-
-        <View style={styles.table}>
-          <View style={styles.tableHeaderRow}>
-            <Text style={[styles.colItem, styles.tableHeaderText]}>Item</Text>
-            <Text style={[styles.colQty, styles.tableHeaderText]}>Qty</Text>
-            <Text style={[styles.colPrice, styles.tableHeaderText]}>
-              Unit Price
-            </Text>
-            <Text style={[styles.colTotal, styles.tableHeaderText]}>
-              Line Total
-            </Text>
-          </View>
-          {booking.items.map((item) => (
-            <View style={styles.tableRow} key={item.id}>
-              <Text style={styles.colItem}>{item.itemName}</Text>
-              <Text style={styles.colQty}>{item.quantity}</Text>
-              <Text style={styles.colPrice}>{item.unitPrice.toFixed(2)}</Text>
-              <Text style={styles.colTotal}>{item.lineTotal.toFixed(2)}</Text>
+        <View style={styles.body}>
+          <View style={styles.metaGrid}>
+            <View style={styles.metaItem}>
+              <Text style={styles.metaLabel}>Customer</Text>
+              <Text style={styles.metaValue}>{booking.customerName}</Text>
             </View>
-          ))}
-        </View>
+            <View style={styles.metaItem}>
+              <Text style={styles.metaLabel}>Phone</Text>
+              <Text style={styles.metaValue}>{booking.phone}</Text>
+            </View>
+            <View style={styles.metaItem}>
+              <Text style={styles.metaLabel}>Received</Text>
+              <Text style={styles.metaValue}>
+                {new Date(booking.createdAt).toLocaleString()}
+              </Text>
+            </View>
+            <View style={styles.metaItem}>
+              <Text style={styles.metaLabel}>Booking #</Text>
+              <Text style={styles.metaValue}>{booking.bookingCode}</Text>
+            </View>
+          </View>
 
-        <View style={styles.totalRow}>
-          <Text style={styles.totalText}>
-            Total: {booking.totalAmount.toFixed(2)}
-          </Text>
-        </View>
+          <View style={styles.deliveryBanner}>
+            <View>
+              <Text style={styles.deliveryLabel}>Expected Delivery</Text>
+              <Text style={styles.deliveryValue}>
+                {expectedDelivery.toLocaleDateString(undefined, {
+                  weekday: "long",
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </Text>
+            </View>
+            <Text style={styles.deliveryLabel}>5-day turnaround</Text>
+          </View>
 
-        {booking.notes && (
-          <Text style={styles.notes}>Notes: {booking.notes}</Text>
-        )}
+          <View style={styles.table}>
+            <View style={styles.tableHeaderRow}>
+              <Text style={[styles.colItem, styles.tableHeaderText]}>
+                Item
+              </Text>
+              <Text style={[styles.colQty, styles.tableHeaderText]}>Qty</Text>
+              <Text style={[styles.colPrice, styles.tableHeaderText]}>
+                Unit Price
+              </Text>
+              <Text style={[styles.colTotal, styles.tableHeaderText]}>
+                Line Total
+              </Text>
+            </View>
+            {booking.items.map((item, index) => (
+              <View
+                style={[
+                  styles.tableRow,
+                  ...(index % 2 === 1 ? [styles.tableRowAlt] : []),
+                ]}
+                key={item.id}
+              >
+                <Text style={styles.colItem}>{item.itemName}</Text>
+                <Text style={styles.colQty}>{item.quantity}</Text>
+                <Text style={styles.colPrice}>
+                  {item.unitPrice.toFixed(2)}
+                </Text>
+                <Text style={styles.colTotal}>
+                  {item.lineTotal.toFixed(2)}
+                </Text>
+              </View>
+            ))}
+          </View>
+
+          <View style={styles.totalRow}>
+            <Text style={styles.totalLabel}>Total</Text>
+            <Text style={styles.totalText}>
+              {booking.totalAmount.toFixed(2)}
+            </Text>
+          </View>
+
+          <View style={styles.paymentBox}>
+            <Image style={styles.paymentQr} src={QR_CODE_BUFFER} />
+            <View>
+              <Text style={styles.paymentLabel}>Scan to Pay</Text>
+              <Text style={styles.paymentValue}>Meezan Bank</Text>
+            </View>
+          </View>
+
+          {booking.notes && (
+            <Text style={styles.notes}>Notes: {booking.notes}</Text>
+          )}
+
+          <View style={styles.footer}>
+            <Text style={styles.footerText}>
+              Thank you for choosing {shopName}!
+            </Text>
+          </View>
+        </View>
       </Page>
     </Document>
   );

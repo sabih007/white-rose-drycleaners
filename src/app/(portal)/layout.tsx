@@ -45,6 +45,11 @@ export default function PortalLayout({
       <main className="mx-auto w-full max-w-4xl flex-1 px-4 py-6">
         {children}
       </main>
+      <footer className="border-t bg-card py-4 print:hidden">
+        <p className="text-center text-xs text-muted-foreground">
+          Designed and Developed By Nexivostudio.io
+        </p>
+      </footer>
     </div>
   );
 }

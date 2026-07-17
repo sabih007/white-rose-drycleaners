@@ -2,9 +2,10 @@
 
 import Link from "next/link";
 import { useMemo, useRef, useState } from "react";
-import { Search as SearchIcon, X } from "lucide-react";
+import { Search as SearchIcon, X, Printer } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -127,8 +128,24 @@ export default function RecentBookings({
                     {statusLabel[b.status]}
                   </Badge>
                 </TableCell>
-                <TableCell className="hidden text-muted-foreground sm:table-cell">
-                  {new Date(b.createdAt).toLocaleDateString()}
+                <TableCell className="hidden py-3 text-muted-foreground sm:table-cell">
+                  <div className="flex items-center gap-4">
+                    <span>{new Date(b.createdAt).toLocaleDateString()}</span>
+                    <Button
+                      size="sm"
+                      className="ml-2 rounded-full bg-primary text-primary-foreground shadow-sm transition-transform hover:scale-105 hover:bg-primary/90 hover:shadow-md"
+                      render={
+                        <a
+                          href={`/api/bookings/${b.id}/pdf?inline=1`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        />
+                      }
+                    >
+                      <Printer className="size-3.5" />
+                      Print
+                    </Button>
+                  </div>
                 </TableCell>
               </TableRow>
             ))}

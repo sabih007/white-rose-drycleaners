@@ -5,10 +5,11 @@ import { serializeBooking } from "@/lib/serialize";
 import { ReceiptDocument } from "@/lib/receipt-pdf";
 
 export async function GET(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
+  const inline = request.nextUrl.searchParams.get("inline") === "1";
   const booking = await prisma.booking.findUnique({
     where: { id },
     include: { items: true },
@@ -27,7 +28,7 @@ export async function GET(
   return new NextResponse(new Uint8Array(buffer), {
     headers: {
       "Content-Type": "application/pdf",
-      "Content-Disposition": `attachment; filename="receipt-${b.id}.pdf"`,
+      "Content-Disposition": `${inline ? "inline" : "attachment"}; filename="receipt-${b.id}.pdf"`,
     },
   });
 }

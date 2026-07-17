@@ -92,10 +92,17 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <main className="flex flex-1 items-center justify-center bg-muted/30 p-4">
-      <Suspense fallback={null}>
-        <LoginForm />
-      </Suspense>
-    </main>
+    <div className="flex flex-1 flex-col bg-muted/30">
+      <main className="flex flex-1 items-center justify-center p-4">
+        <Suspense fallback={null}>
+          <LoginForm />
+        </Suspense>
+      </main>
+      <footer className="py-4">
+        <p className="text-center text-xs text-muted-foreground">
+          Designed and Developed By Nexivostudio.io
+        </p>
+      </footer>
+    </div>
   );
 }
