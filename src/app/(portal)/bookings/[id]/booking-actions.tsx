@@ -83,7 +83,16 @@ export default function BookingActions({
       </div>
 
       <div className="flex flex-wrap items-center gap-2">
-        <Button variant="outline" onClick={() => window.print()}>
+        <Button
+          variant="outline"
+          render={
+            <a
+              href={`/api/bookings/${id}/pdf?inline=1`}
+              target="_blank"
+              rel="noopener noreferrer"
+            />
+          }
+        >
           <Printer />
           Print Receipt
         </Button>

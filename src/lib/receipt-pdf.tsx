@@ -12,6 +12,9 @@ import {
 const QR_CODE_BUFFER = fs.readFileSync(
   path.join(process.cwd(), "public", "qr.png")
 );
+const LOGO_BUFFER = fs.readFileSync(
+  path.join(process.cwd(), "public", "logo.png")
+);
 
 type SerializedBooking = {
   id: string;
@@ -31,7 +34,7 @@ type SerializedBooking = {
   }[];
 };
 
-const ACCENT = "#0f766e";
+const ACCENT = "#583101";
 
 const styles = StyleSheet.create({
   page: {
@@ -40,21 +43,22 @@ const styles = StyleSheet.create({
     color: "#171717",
   },
   headerBand: {
-    backgroundColor: ACCENT,
+    backgroundColor: "#faf3ea",
     paddingHorizontal: 32,
-    paddingVertical: 20,
+    paddingVertical: 10,
+    borderBottomWidth: 2,
+    borderBottomColor: ACCENT,
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "flex-start",
+    alignItems: "center",
+  },
+  logo: {
+    width: 81,
+    height: 60,
   },
   body: {
     padding: 32,
-    paddingTop: 20,
-  },
-  shopName: {
-    fontSize: 18,
-    fontWeight: 700,
-    color: "#ffffff",
+    paddingTop: 16,
   },
   subtle: {
     fontSize: 9,
@@ -63,7 +67,7 @@ const styles = StyleSheet.create({
   },
   headerSubtle: {
     fontSize: 9,
-    color: "#d1fae5",
+    color: "#8a6a45",
     marginTop: 3,
     letterSpacing: 0.5,
   },
@@ -73,18 +77,18 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     paddingHorizontal: 10,
     borderRadius: 10,
-    backgroundColor: "#ffffff",
-    color: ACCENT,
+    backgroundColor: ACCENT,
+    color: "#ffffff",
   },
   metaGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    marginTop: 20,
+    marginTop: 14,
     marginBottom: 4,
   },
   metaItem: {
     width: "50%",
-    marginBottom: 12,
+    marginBottom: 10,
   },
   metaLabel: {
     fontSize: 8.5,
@@ -102,23 +106,23 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     padding: 12,
     borderRadius: 6,
-    backgroundColor: "#f0fdfa",
+    backgroundColor: "#faf3ea",
     borderWidth: 1,
-    borderColor: "#99f6e4",
+    borderColor: "#e7bc91",
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
   },
   deliveryLabel: {
     fontSize: 9,
-    color: "#0f766e",
+    color: "#583101",
     textTransform: "uppercase",
     letterSpacing: 0.6,
   },
   deliveryValue: {
     fontSize: 13,
     fontWeight: 700,
-    color: "#115e59",
+    color: "#3a1f00",
     marginTop: 2,
   },
   table: {
@@ -178,7 +182,7 @@ const styles = StyleSheet.create({
     color: "#525252",
   },
   footer: {
-    marginTop: 28,
+    marginTop: 18,
     paddingTop: 12,
     borderTopWidth: 1,
     borderTopColor: "#e5e5e5",
@@ -241,7 +245,7 @@ export function ReceiptDocument({
       <Page size="A5" style={styles.page}>
         <View style={styles.headerBand}>
           <View>
-            <Text style={styles.shopName}>{shopName}</Text>
+            <Image style={styles.logo} src={LOGO_BUFFER} />
             <Text style={styles.headerSubtle}>
               RECEIPT #{booking.bookingCode}
             </Text>

@@ -2,7 +2,7 @@
 
 import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Shirt } from "lucide-react";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,7 +11,6 @@ import {
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
@@ -48,13 +47,15 @@ function LoginForm() {
   return (
     <Card className="w-full max-w-sm">
       <CardHeader>
-        <div className="mb-1 flex items-center gap-2">
-          <div className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <Shirt className="size-4" />
-          </div>
-          <CardTitle className="text-lg">Dry Cleaner Portal</CardTitle>
-        </div>
-        <CardDescription>
+        <Image
+          src="/logo.png"
+          alt="White Rose Drycleaners"
+          width={800}
+          height={595}
+          className="mx-auto mb-1 h-24 w-auto"
+          priority
+        />
+        <CardDescription className="text-center">
           Enter the shop password to continue.
         </CardDescription>
       </CardHeader>

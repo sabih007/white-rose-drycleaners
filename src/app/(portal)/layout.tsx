@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Shirt } from "lucide-react";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import LogoutButton from "./logout-button";
 import MobileNav from "./mobile-nav";
@@ -16,12 +16,14 @@ export default function PortalLayout({
       <header className="border-b bg-card print:hidden">
         <div className="mx-auto flex max-w-4xl items-center justify-between px-4 py-3">
           <Link href="/" className="flex min-w-0 items-center gap-2">
-            <div className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-              <Shirt className="size-4" />
-            </div>
-            <span className="truncate text-sm font-semibold text-foreground">
-              {shopName}
-            </span>
+            <Image
+              src="/logo.png"
+              alt={shopName}
+              width={800}
+              height={595}
+              className="h-11 w-auto shrink-0"
+              priority
+            />
           </Link>
           <nav className="hidden items-center gap-1 sm:flex">
             <Button variant="ghost" size="sm" render={<Link href="/" />}>

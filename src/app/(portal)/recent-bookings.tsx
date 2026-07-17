@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useRef, useState } from "react";
-import { Search as SearchIcon, X, Printer } from "lucide-react";
+import { Search as SearchIcon, X, Printer, Eye } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -105,6 +105,7 @@ export default function RecentBookings({
               <TableHead>Total</TableHead>
               <TableHead>Status</TableHead>
               <TableHead className="hidden sm:table-cell">Date</TableHead>
+              <TableHead className="hidden sm:table-cell">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -129,11 +130,21 @@ export default function RecentBookings({
                   </Badge>
                 </TableCell>
                 <TableCell className="hidden py-3 text-muted-foreground sm:table-cell">
-                  <div className="flex items-center gap-4">
-                    <span>{new Date(b.createdAt).toLocaleDateString()}</span>
+                  {new Date(b.createdAt).toLocaleDateString()}
+                </TableCell>
+                <TableCell className="hidden py-3 sm:table-cell">
+                  <div className="flex items-center gap-2">
                     <Button
                       size="sm"
-                      className="ml-2 rounded-full bg-primary text-primary-foreground shadow-sm transition-transform hover:scale-105 hover:bg-primary/90 hover:shadow-md"
+                      variant="outline"
+                      render={<Link href={`/bookings/${b.id}`} />}
+                    >
+                      <Eye className="size-3.5" />
+                      View Details
+                    </Button>
+                    <Button
+                      size="sm"
+                      className="rounded-full bg-primary text-primary-foreground shadow-sm transition-transform hover:scale-105 hover:bg-primary/90 hover:shadow-md"
                       render={
                         <a
                           href={`/api/bookings/${b.id}/pdf?inline=1`}
